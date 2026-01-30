@@ -1,0 +1,35 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+h1, h2 {
+    text-align: center;
+}
+.item {
+    background: white;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+button {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+#cart li {
+    list-style: none;
+    background: #e0e0e0;
+    padding: 10px;
+    margin: 5px 0;
+}
+#notes {
+    width: 100%;
+    height: 100px;
+    margin: 10px 0;
+}
