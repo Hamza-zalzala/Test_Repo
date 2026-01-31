@@ -164,6 +164,7 @@ function renderCart() {
 // ────────────────────────────────────────────────
 // إرسال الطلب
 tg.MainButton.onClick(() => {
+    console.log("حاول إرسال البيانات..."); // سطر للفحص
     if (cart.length === 0) {
         tg.showAlert("السلة فارغة!");
         return;
@@ -181,7 +182,8 @@ tg.MainButton.onClick(() => {
         total: total,
         notes: notes
     };
-
+    alert("سيتم إرسال الطلب الآن: " + JSON.stringify(orderData)); // تنبيه تجريبي
     tg.sendData(JSON.stringify(orderData));
     tg.close();
+
 });
