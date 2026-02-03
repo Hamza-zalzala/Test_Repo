@@ -5,6 +5,7 @@ tg.expand();
 let cart = [];
 let menuData = {};
 
+// الأقسام المتاحة
 const categories = {
     "المعجنات": "🥐 المعجنات",
     "البيتزا": "🍕 البيتزا",
@@ -13,12 +14,13 @@ const categories = {
     "المشروبات": "🥤 المشروبات"
 };
 
+// جلب البيانات من ملف menu.json
 fetch('menu.json')
     .then(res => res.json())
     .then(data => {
         menuData = data;
         renderTabs();
-        showCategory(Object.keys(data)[0]);
+        showCategory(Object.keys(data)[0]); // عرض أول قسم تلقائياً
     });
 
 function renderTabs() {
@@ -47,15 +49,18 @@ function showCategory(key) {
     items.forEach(item => {
         const itemName = item.النوع || item.name || item.size;
         const itemPrice = item.السعر || item.price;
+        
+        // البحث عن الكمية الحالية في السلة
         const cartItem = cart.find(i => i.name === itemName);
         const qty = cartItem ? cartItem.quantity : 0;
 
         const card = document.createElement('div');
         card.className = 'item-card no-image';
+
         card.innerHTML = `
             <div class="item-info">
                 <div class="item-name">${itemName}</div>
-                <div class="item-price">${itemPrice.toLocaleString()} ل.س</div>
+                <div class="item-price">${Number(itemPrice).toLocaleString()} ل.س</div>
             </div>
             <div class="qty-control">
                 <button class="qty-btn minus" onclick="updateQty('${itemName}', ${itemPrice}, -1)">-</button>
@@ -67,49 +72,64 @@ function showCategory(key) {
     });
 }
 
-// التعديل الجوهري لحل مشكلة تحديث السعر
+// الوظيفة المسؤولة عن تحديث السلة والحساب اللحظي
 window.updateQty = (name, price, change) => {
     const itemIndex = cart.findIndex(i => i.name === name);
     
     if (itemIndex > -1) {
+        // إذا كان الصنف موجوداً، نحدث الكمية
         cart[itemIndex].quantity += change;
+        
+        // إذا وصلت الكمية لصفر، نحذفه من المصفوفة تماماً
         if (cart[itemIndex].quantity <= 0) {
             cart.splice(itemIndex, 1);
         }
     } else if (change > 0) {
-        cart.push({ name, price: Number(price), quantity: 1 });
+        // إذا كان الصنف غير موجود ونريد الإضافة
+        cart.push({ 
+            name: name, 
+            price: Number(price), 
+            quantity: 1 
+        });
     }
 
-    // تحديث الرقم الظاهر فوراً
+    // 1. تحديث رقم الكمية الظاهر في البطاقة فوراً
     const qtySpan = document.getElementById(`qty-${name}`);
     const currentItem = cart.find(i => i.name === name);
-    if (qtySpan) qtySpan.textContent = currentItem ? currentItem.quantity : 0;
+    if (qtySpan) {
+        qtySpan.textContent = currentItem ? currentItem.quantity : 0;
+    }
 
-    updateMainButton();
+    // 2. تحديث الإجمالي والزر الرئيسي
+    refreshTotals();
 };
 
-function updateMainButton() {
-    // إعادة حساب الإجمالي من المصفوفة لضمان الدقة
-    const total = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
-    const totalEl = document.getElementById('total');
+function refreshTotals() {
+    // حساب الإجمالي مباشرة من المصفوفة لضمان الدقة اللحظية
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     
-    if (totalEl) totalEl.textContent = total.toLocaleString();
+    // تحديث نص الإجمالي في الصفحة
+    const totalEl = document.getElementById('total');
+    if (totalEl) {
+        totalEl.textContent = total.toLocaleString();
+    }
 
+    // تحديث زر التليجرام
     if (cart.length > 0) {
-        tg.MainButton.text = `تأكيد الطلب ${total.toLocaleString()} ل.س`;
+        tg.MainButton.setText(`تأكيد الطلب (${total.toLocaleString()} ل.س)`);
         tg.MainButton.show();
     } else {
         tg.MainButton.hide();
     }
 }
 
+// عند الضغط على زر "تأكيد الطلب" في تليجرام
 tg.MainButton.onClick(() => {
-    const total = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+    const finalTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const data = {
         orders: cart,
-        total: total,
+        total: finalTotal,
         notes: document.getElementById('notes').value
     };
     tg.sendData(JSON.stringify(data));
 });
-
