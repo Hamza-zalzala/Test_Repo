@@ -5,7 +5,6 @@ tg.expand();
 let cart = [];
 let menuData = {};
 
-// تحديث الأقسام مع إضافة أيقونات كبديل بصري عن الصور
 const categories = {
     "المعجنات": "🥐 المعجنات",
     "البيتزا": "🍕 البيتزا",
@@ -52,8 +51,7 @@ function showCategory(key) {
         const qty = cartItem ? cartItem.quantity : 0;
 
         const card = document.createElement('div');
-        card.className = 'item-card no-image'; // فئة جديدة للتصميم بدون صور
-
+        card.className = 'item-card no-image';
         card.innerHTML = `
             <div class="item-info">
                 <div class="item-name">${itemName}</div>
@@ -69,23 +67,32 @@ function showCategory(key) {
     });
 }
 
+// التعديل الجوهري لحل مشكلة تحديث السعر
 window.updateQty = (name, price, change) => {
     const itemIndex = cart.findIndex(i => i.name === name);
+    
     if (itemIndex > -1) {
         cart[itemIndex].quantity += change;
-        if (cart[itemIndex].quantity <= 0) cart.splice(itemIndex, 1);
+        if (cart[itemIndex].quantity <= 0) {
+            cart.splice(itemIndex, 1);
+        }
     } else if (change > 0) {
         cart.push({ name, price: Number(price), quantity: 1 });
     }
+
+    // تحديث الرقم الظاهر فوراً
     const qtySpan = document.getElementById(`qty-${name}`);
     const currentItem = cart.find(i => i.name === name);
     if (qtySpan) qtySpan.textContent = currentItem ? currentItem.quantity : 0;
+
     updateMainButton();
 };
 
 function updateMainButton() {
+    // إعادة حساب الإجمالي من المصفوفة لضمان الدقة
     const total = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
     const totalEl = document.getElementById('total');
+    
     if (totalEl) totalEl.textContent = total.toLocaleString();
 
     if (cart.length > 0) {
@@ -97,9 +104,10 @@ function updateMainButton() {
 }
 
 tg.MainButton.onClick(() => {
+    const total = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
     const data = {
         orders: cart,
-        total: cart.reduce((sum, i) => sum + (i.price * i.quantity), 0),
+        total: total,
         notes: document.getElementById('notes').value
     };
     tg.sendData(JSON.stringify(data));
