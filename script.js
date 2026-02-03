@@ -96,7 +96,7 @@ function updateMainButton() {
     if (totalEl) totalEl.textContent = total.toLocaleString();
 
     if (cart.length > 0) {
-        tg.MainButton.text = `تأكيد الطلب (${total.toLocaleString()} ل.س)`;
+        tg.MainButton.text = `تأكيد الطلب ${total.toLocaleString()} ل.س`;
         tg.MainButton.show();
     } else {
         tg.MainButton.hide();
@@ -112,3 +112,4 @@ tg.MainButton.onClick(() => {
     };
     tg.sendData(JSON.stringify(data));
 });
+
