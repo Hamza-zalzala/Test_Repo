@@ -5,7 +5,6 @@ tg.expand();
 let cart = [];
 let menuData = {};
 
-// الأقسام المتاحة
 const categories = {
     "المعجنات": "🥐 المعجنات",
     "البيتزا": "🍕 البيتزا",
@@ -14,13 +13,12 @@ const categories = {
     "المشروبات": "🥤 المشروبات"
 };
 
-// جلب البيانات من ملف menu.json
 fetch('menu.json')
     .then(res => res.json())
     .then(data => {
         menuData = data;
         renderTabs();
-        showCategory(Object.keys(data)[0]); // عرض أول قسم تلقائياً
+        showCategory(Object.keys(data)[0]);
     });
 
 function renderTabs() {
@@ -43,20 +41,16 @@ function showCategory(key) {
     const container = document.getElementById('menu');
     container.innerHTML = '<div class="menu-grid"></div>';
     const grid = container.querySelector('.menu-grid');
-
     let items = Array.isArray(menuData[key]) ? menuData[key] : (menuData[key].sizes || []);
 
     items.forEach(item => {
         const itemName = item.النوع || item.name || item.size;
         const itemPrice = item.السعر || item.price;
-        
-        // البحث عن الكمية الحالية في السلة
         const cartItem = cart.find(i => i.name === itemName);
         const qty = cartItem ? cartItem.quantity : 0;
 
         const card = document.createElement('div');
         card.className = 'item-card no-image';
-
         card.innerHTML = `
             <div class="item-info">
                 <div class="item-name">${itemName}</div>
@@ -72,58 +66,47 @@ function showCategory(key) {
     });
 }
 
-// الوظيفة المسؤولة عن تحديث السلة والحساب اللحظي
+// التعديل هنا لضمان تحديث نص الزر فوراً وبدقة
 window.updateQty = (name, price, change) => {
     const itemIndex = cart.findIndex(i => i.name === name);
     
     if (itemIndex > -1) {
-        // إذا كان الصنف موجوداً، نحدث الكمية
         cart[itemIndex].quantity += change;
-        
-        // إذا وصلت الكمية لصفر، نحذفه من المصفوفة تماماً
-        if (cart[itemIndex].quantity <= 0) {
-            cart.splice(itemIndex, 1);
-        }
+        if (cart[itemIndex].quantity <= 0) cart.splice(itemIndex, 1);
     } else if (change > 0) {
-        // إذا كان الصنف غير موجود ونريد الإضافة
-        cart.push({ 
-            name: name, 
-            price: Number(price), 
-            quantity: 1 
-        });
+        cart.push({ name: name, price: Number(price), quantity: 1 });
     }
 
-    // 1. تحديث رقم الكمية الظاهر في البطاقة فوراً
+    // تحديث الأرقام على الشاشة
     const qtySpan = document.getElementById(`qty-${name}`);
     const currentItem = cart.find(i => i.name === name);
-    if (qtySpan) {
-        qtySpan.textContent = currentItem ? currentItem.quantity : 0;
-    }
+    if (qtySpan) qtySpan.textContent = currentItem ? currentItem.quantity : 0;
 
-    // 2. تحديث الإجمالي والزر الرئيسي
-    refreshTotals();
+    // استدعاء تحديث الزر
+    syncTelegramButton();
 };
 
-function refreshTotals() {
-    // حساب الإجمالي مباشرة من المصفوفة لضمان الدقة اللحظية
-    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+function syncTelegramButton() {
+    // حساب الإجمالي الفعلي الحالي من المصفوفة
+    const currentTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     
-    // تحديث نص الإجمالي في الصفحة
+    // تحديث النص في الصفحة (الذي تقول أنه يظهر صحيحاً)
     const totalEl = document.getElementById('total');
-    if (totalEl) {
-        totalEl.textContent = total.toLocaleString();
-    }
+    if (totalEl) totalEl.textContent = currentTotal.toLocaleString();
 
-    // تحديث زر التليجرام
+    // تحديث زر التليجرام - استخدمنا setParams لضمان التحديث الشامل
     if (cart.length > 0) {
-        tg.MainButton.setText(`تأكيد الطلب (${total.toLocaleString()} ل.س)`);
-        tg.MainButton.show();
+        tg.MainButton.setParams({
+            text: `تأكيد الطلب (${currentTotal.toLocaleString()} ل.س)`,
+            is_visible: true,
+            is_active: true
+        });
     } else {
         tg.MainButton.hide();
     }
 }
 
-// عند الضغط على زر "تأكيد الطلب" في تليجرام
+// التأكد من إرسال البيانات الصحيحة عند الضغط
 tg.MainButton.onClick(() => {
     const finalTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const data = {
