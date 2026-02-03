@@ -1,18 +1,29 @@
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قائمة المطعم</title>
+    <title>منيو المطعم</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <h1>قائمة الأصناف</h1>
-    <div id="menu"></div>
-    <h2>سلة الطلبات</h2>
-    <ul id="cart"></ul>
-    <p>الإجمالي: <span id="total">0</span> ليرة</p>
-    <textarea id="notes" placeholder="أضف ملاحظاتك (مثل: بدون بصل)"></textarea>
+    <header>
+        <h1 style="text-align: center; margin: 0 0 10px 0; font-size: 1.4rem;">♨️ قائمة الطعام</h1>
+        <div id="tabs-nav" class="tabs-nav"></div>
+    </header>
+
+    <main id="menu"></main>
+
+    <section class="order-summary">
+        <h3 style="margin-bottom: 10px;">📝 ملاحظات إضافية</h3>
+        <textarea id="notes" placeholder="هل ترغب بإضافة أو إزالة شيء؟"></textarea>
+        <div style="margin-top: 15px; font-weight: bold; font-size: 1.2rem;">
+            الإجمالي: <span id="total" style="color: var(--main-color);">0</span> ل.س
+        </div>
+    </section>
+
     <script src="script.js"></script>
 </body>
 </html>
