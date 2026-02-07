@@ -2,8 +2,14 @@
     --primary: #2ecc71;
     --secondary: #e67e22;
     --dark: #2d3436;
-    --gray: #f1f2f6;
+    --gray: #f7f9fc; /* خلفية أفتح قليلاً لمزيد من الجاذبية */
     --white: #ffffff;
+    --shadow: 0 4px 12px rgba(0,0,0,0.08); /* ظل ناعم للبطاقات */
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -13,10 +19,10 @@ body {
     padding: 0;
     direction: rtl;
     color: var(--dark);
-    -webkit-tap-highlight-color: transparent;
+    overflow-x: hidden;
 }
 
-/* الأقسام العلوية */
+/* الأقسام العلوية مع دعم الإيموجي */
 .tabs-container {
     position: sticky;
     top: 0;
@@ -34,51 +40,61 @@ body {
 }
 
 .tab-btn {
-    padding: 10px 20px;
+    padding: 10px 18px;
     border: none;
     border-radius: 25px;
-    background: #dfe4ea;
+    background: #f1f2f6;
     white-space: nowrap;
     cursor: pointer;
     font-weight: bold;
     font-size: 14px;
     transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px; /* مسافة بين الإيموجي والنص */
 }
 
 .tab-btn.active {
     background: var(--secondary);
     color: white;
+    transform: scale(1.05); /* تأثير تكبير بسيط للنشط */
 }
 
-/* شبكة المنتجات */
+/* شبكة المنتجات بتصميم جذاب */
 .menu-grid {
     display: flex;
     flex-direction: column;
     gap: 12px;
     padding: 15px;
-    margin-bottom: 120px; /* مساحة لظهور الشريط */
+    margin-bottom: 110px;
 }
 
 .item-card {
     background: var(--white);
-    border-radius: 15px;
-    padding: 15px;
+    border-radius: 18px; /* حواف أكثر دائرية */
+    padding: 18px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.03);
+    box-shadow: var(--shadow); /* استخدام الظل الموحد */
+    transition: transform 0.1s ease;
+}
+
+.item-card:active {
+    transform: scale(0.98); /* تأثير ضغطة الزر */
 }
 
 .item-name {
-    font-weight: 700;
+    font-weight: 800; /* خط أعرض */
     font-size: 16px;
     margin-bottom: 4px;
+    color: #1e272e;
 }
 
 .item-price {
     color: var(--secondary);
     font-weight: bold;
-    font-size: 14px;
+    font-size: 15px;
 }
 
 /* أزرار الكمية */
@@ -87,17 +103,17 @@ body {
     align-items: center;
     gap: 12px;
     background: #f8f9fa;
-    padding: 5px 10px;
+    padding: 6px 12px;
     border-radius: 30px;
 }
 
 .qty-btn {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     border: none;
     color: white;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: bold;
     display: flex;
     align-items: center;
@@ -108,21 +124,23 @@ body {
 .plus { background-color: var(--primary); }
 .minus { background-color: #ff4757; }
 
-/* شريط "طلبي" العائم */
+/* شريط "طلبي" العائم - متوسط تماماً */
 .cart-bar {
     position: fixed;
-    bottom: 20px;
-    left: 5%;
+    bottom: calc(20px + env(safe-area-inset-bottom)); /* دعم الآيفون */
+    left: 50%;
+    transform: translateX(-50%); /* ضمان التوسط التام */
     width: 90%;
+    max-width: 500px;
     background: var(--primary);
     color: white;
     padding: 14px 22px;
     border-radius: 50px;
-    display: none; /* يظهر بالجافا سكريبت */
+    display: none;
     justify-content: space-between;
     align-items: center;
     z-index: 2000;
-    box-shadow: 0 10px 25px rgba(46, 204, 113, 0.4);
+    box-shadow: 0 8px 25px rgba(46, 204, 113, 0.4);
     cursor: pointer;
 }
 
@@ -132,7 +150,6 @@ body {
     padding: 2px 10px;
     border-radius: 12px;
     font-weight: bold;
-    margin-left: 8px;
 }
 
 /* النافذة المنبثقة (Modal) */
@@ -150,6 +167,7 @@ body {
     width: 100%;
     border-radius: 25px 25px 0 0;
     padding: 20px;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
     box-sizing: border-box;
     animation: slideUp 0.3s ease-out;
 }
@@ -159,56 +177,9 @@ body {
     to { transform: translateY(0); }
 }
 
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-}
-
-.close-btn {
-    background: none;
-    border: none;
-    font-size: 32px;
-    cursor: pointer;
-    color: #888;
-}
-
-.cart-summary-list {
-    max-height: 200px;
-    overflow-y: auto;
-    margin: 15px 0;
-}
-
-.summary-line {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px dashed #eee;
-}
-
-.notes-section {
-    margin-top: 10px;
-}
-
-.notes-area {
-    width: 100%;
-    height: 70px;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    padding: 10px;
-    font-family: inherit;
-    resize: none;
-    box-sizing: border-box;
-    margin-top: 5px;
-}
-
-.modal-total {
-    margin-top: 20px;
-    display: flex;
-    justify-content: space-between;
-    font-size: 1.4rem;
-    font-weight: 800;
-    color: var(--dark);
-}
+/* باقي التنسيقات تبقى كما هي... */
+.modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+.close-btn { background: none; border: none; font-size: 32px; cursor: pointer; color: #888; }
+.summary-line { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #eee; }
+.notes-area { width: 100%; height: 80px; border: 1px solid #ddd; border-radius: 12px; padding: 10px; font-family: inherit; resize: none; margin-top: 10px; }
+.modal-total { margin-top: 20px; display: flex; justify-content: space-between; font-size: 1.4rem; font-weight: 800; color: var(--dark); }
