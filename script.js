@@ -103,8 +103,7 @@
 //         notes: document.getElementById('notes').value
 //     };
 //     tg.sendData(JSON.stringify(data));
-// });const tg = window.Telegram.WebApp;
-
+// });
 const tg = window.Telegram.WebApp;
 tg.ready();
 tg.expand();
@@ -112,7 +111,6 @@ tg.expand();
 let cart = [];
 let menuData = {};
 
-// قاموس الإيموجي للأقسام (تأكد أن الأسماء تطابق ملف menu.json)
 const categoryEmojis = {
     "المعجنات": "🥐",
     "البيتزا": "🍕",
@@ -121,14 +119,11 @@ const categoryEmojis = {
     "المشروبات": "🥤"
 };
 
-// تحميل البيانات
-fetch('menu.json')
-    .then(res => res.json())
-    .then(data => {
-        menuData = data;
-        renderTabs();
-        showCategory(Object.keys(data)[0]);
-    });
+fetch('menu.json').then(res => res.json()).then(data => {
+    menuData = data;
+    renderTabs();
+    showCategory(Object.keys(data)[0]);
+});
 
 function renderTabs() {
     const nav = document.getElementById('tabs-nav');
@@ -175,7 +170,7 @@ function showCategory(key) {
     });
 }
 
-// *** تعريف الدالة كـ window لضمان عمل الأزرار ***
+// تعريف عالمي لضمان عمل الأزرار داخل innerHTML
 window.updateQty = function(name, price, change) {
     const index = cart.findIndex(i => i.name === name);
     if (index > -1) {
@@ -184,12 +179,8 @@ window.updateQty = function(name, price, change) {
     } else if (change > 0) {
         cart.push({ name, price: Number(price), quantity: 1 });
     }
-    
     const qtySpan = document.getElementById(`qty-${name}`);
-    if (qtySpan) {
-        const item = cart.find(i => i.name === name);
-        qtySpan.textContent = item ? item.quantity : 0;
-    }
+    if (qtySpan) qtySpan.textContent = cart.find(i => i.name === name)?.quantity || 0;
     updateUI();
 };
 
@@ -238,4 +229,3 @@ tg.MainButton.onClick(() => {
         notes: document.getElementById('notes').value
     }));
 });
-
