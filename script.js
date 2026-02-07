@@ -1,4 +1,109 @@
+// const tg = window.Telegram.WebApp;
+// tg.ready();
+// tg.expand();
 
+// let cart = [];
+// let menuData = {};
+
+// // تحديث الأقسام مع إضافة أيقونات كبديل بصري عن الصور
+// const categories = {
+//     "المعجنات": "🥐 المعجنات",
+//     "البيتزا": "🍕 البيتزا",
+//     "المعجنات_دبل": "🥪 معجنات دبل",
+//     "السندويش": "🌯 السندويش",
+//     "المشروبات": "🥤 المشروبات"
+// };
+
+// fetch('menu.json')
+//     .then(res => res.json())
+//     .then(data => {
+//         menuData = data;
+//         renderTabs();
+//         showCategory(Object.keys(data)[0]);
+//     });
+
+// function renderTabs() {
+//     const nav = document.getElementById('tabs-nav');
+//     nav.innerHTML = '';
+//     Object.keys(menuData).forEach((key, index) => {
+//         const btn = document.createElement('button');
+//         btn.className = `tab-btn ${index === 0 ? 'active' : ''}`;
+//         btn.textContent = categories[key] || key;
+//         btn.onclick = () => {
+//             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+//             btn.classList.add('active');
+//             showCategory(key);
+//         };
+//         nav.appendChild(btn);
+//     });
+// }
+
+// function showCategory(key) {
+//     const container = document.getElementById('menu');
+//     container.innerHTML = '<div class="menu-grid"></div>';
+//     const grid = container.querySelector('.menu-grid');
+
+//     let items = Array.isArray(menuData[key]) ? menuData[key] : (menuData[key].sizes || []);
+
+//     items.forEach(item => {
+//         const itemName = item.النوع || item.name || item.size;
+//         const itemPrice = item.السعر || item.price;
+//         const cartItem = cart.find(i => i.name === itemName);
+//         const qty = cartItem ? cartItem.quantity : 0;
+
+//         const card = document.createElement('div');
+//         card.className = 'item-card no-image'; // فئة جديدة للتصميم بدون صور
+
+//         card.innerHTML = `
+//             <div class="item-info">
+//                 <div class="item-name">${itemName}</div>
+//                 <div class="item-price">${itemPrice.toLocaleString()} ل.س</div>
+//             </div>
+//             <div class="qty-control">
+//                 <button class="qty-btn minus" onclick="updateQty('${itemName}', ${itemPrice}, -1)">-</button>
+//                 <span class="qty-val" id="qty-${itemName}">${qty}</span>
+//                 <button class="qty-btn plus" onclick="updateQty('${itemName}', ${itemPrice}, 1)">+</button>
+//             </div>
+//         `;
+//         grid.appendChild(card);
+//     });
+// }
+
+// window.updateQty = (name, price, change) => {
+//     const itemIndex = cart.findIndex(i => i.name === name);
+//     if (itemIndex > -1) {
+//         cart[itemIndex].quantity += change;
+//         if (cart[itemIndex].quantity <= 0) cart.splice(itemIndex, 1);
+//     } else if (change > 0) {
+//         cart.push({ name, price: Number(price), quantity: 1 });
+//     }
+//     const qtySpan = document.getElementById(`qty-${name}`);
+//     const currentItem = cart.find(i => i.name === name);
+//     if (qtySpan) qtySpan.textContent = currentItem ? currentItem.quantity : 0;
+//     updateMainButton();
+// };
+
+// function updateMainButton() {
+//     const total = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+//     const totalEl = document.getElementById('total');
+//     if (totalEl) totalEl.textContent = total.toLocaleString();
+
+//     if (cart.length > 0) {
+//         tg.MainButton.text = `تأكيد الطلب (${total.toLocaleString()} ل.س)`;
+//         tg.MainButton.show();
+//     } else {
+//         tg.MainButton.hide();
+//     }
+// }
+
+// tg.MainButton.onClick(() => {
+//     const data = {
+//         orders: cart,
+//         total: cart.reduce((sum, i) => sum + (i.price * i.quantity), 0),
+//         notes: document.getElementById('notes').value
+//     };
+//     tg.sendData(JSON.stringify(data));
+// });
 const tg = window.Telegram.WebApp;
 tg.ready();
 tg.expand();
@@ -6,14 +111,7 @@ tg.expand();
 let cart = [];
 let menuData = {};
 
-const categories = {
-    "المعجنات": "🥐 المعجنات",
-    "البيتزا": "🍕 البيتزا",
-    "المعجنات_دبل": "🥪 معجنات دبل",
-    "السندويش": "🌯 السندويش",
-    "المشروبات": "🥤 المشروبات"
-};
-
+// تحميل البيانات
 fetch('menu.json')
     .then(res => res.json())
     .then(data => {
@@ -24,14 +122,13 @@ fetch('menu.json')
 
 function renderTabs() {
     const nav = document.getElementById('tabs-nav');
-    nav.innerHTML = '';
     Object.keys(menuData).forEach((key, index) => {
         const btn = document.createElement('button');
         btn.className = `tab-btn ${index === 0 ? 'active' : ''}`;
-        btn.textContent = categories[key] || key;
-        btn.onclick = () => {
+        btn.textContent = key;
+        btn.onclick = (e) => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+            e.target.classList.add('active');
             showCategory(key);
         };
         nav.appendChild(btn);
@@ -51,7 +148,7 @@ function showCategory(key) {
         const qty = cartItem ? cartItem.quantity : 0;
 
         const card = document.createElement('div');
-        card.className = 'item-card no-image';
+        card.className = 'item-card';
         card.innerHTML = `
             <div class="item-info">
                 <div class="item-name">${itemName}</div>
@@ -59,57 +156,67 @@ function showCategory(key) {
             </div>
             <div class="qty-control">
                 <button class="qty-btn minus" onclick="updateQty('${itemName}', ${itemPrice}, -1)">-</button>
-                <span class="qty-val" id="qty-${itemName}">${qty}</span>
+                <span id="qty-${itemName}" class="qty-val">${qty}</span>
                 <button class="qty-btn plus" onclick="updateQty('${itemName}', ${itemPrice}, 1)">+</button>
-            </div>
-        `;
+            </div>`;
         grid.appendChild(card);
     });
 }
 
-window.updateQty = (name, price, change) => {
-    const itemIndex = cart.findIndex(i => i.name === name);
-    if (itemIndex > -1) {
-        cart[itemIndex].quantity += change;
-        if (cart[itemIndex].quantity <= 0) cart.splice(itemIndex, 1);
+function updateQty(name, price, change) {
+    const index = cart.findIndex(i => i.name === name);
+    if (index > -1) {
+        cart[index].quantity += change;
+        if (cart[index].quantity <= 0) cart.splice(index, 1);
     } else if (change > 0) {
-        cart.push({ name: name, price: Number(price), quantity: 1 });
+        cart.push({ name, price: Number(price), quantity: 1 });
     }
-
+    
+    // تحديث الرقم في البطاقة فوراً
     const qtySpan = document.getElementById(`qty-${name}`);
     if (qtySpan) {
-        const currentItem = cart.find(i => i.name === name);
-        qtySpan.textContent = currentItem ? currentItem.quantity : 0;
+        const item = cart.find(i => i.name === name);
+        qtySpan.textContent = item ? item.quantity : 0;
     }
     updateUI();
-};
+}
+
+function toggleCart() {
+    const modal = document.getElementById('cart-modal');
+    if (cart.length > 0) {
+        modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+    }
+}
 
 function updateUI() {
     const total = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
-    document.getElementById('total').textContent = total.toLocaleString();
+    const count = cart.reduce((sum, i) => sum + i.quantity, 0);
 
-    // تحديث ملخص السلة في واجهة المستخدم
-    const summaryEl = document.getElementById('cart-summary');
-    if (summaryEl) {
-        if (cart.length > 0) {
-            summaryEl.innerHTML = cart.map(item => 
-                `<div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:4px;">
-                    <span>• ${item.name} × ${item.quantity}</span>
-                    <span>${(item.price * item.quantity).toLocaleString()} ل.س</span>
-                </div>`
-            ).join('');
-        } else {
-            summaryEl.innerHTML = '<div style="color:#aaa; text-align:center;">السلة فارغة</div>';
-        }
+    // تحديث الشريط العائم
+    const cartBar = document.getElementById('cart-bar');
+    if (cart.length > 0) {
+        cartBar.style.display = 'flex';
+        document.getElementById('items-count').textContent = count;
+        document.getElementById('bar-total').textContent = total.toLocaleString() + " ل.س";
+    } else {
+        cartBar.style.display = 'none';
+        document.getElementById('cart-modal').style.display = 'none';
     }
 
+    // تحديث النافذة المنبثقة
+    const summary = document.getElementById('cart-summary');
+    summary.innerHTML = cart.map(i => `
+        <div class="summary-line">
+            <span>${i.name} × ${i.quantity}</span>
+            <span>${(i.price * i.quantity).toLocaleString()} ل.س</span>
+        </div>`).join('');
+    
+    document.getElementById('total').textContent = total.toLocaleString();
+
+    // تحديث زر تليجرام الرئيسي
     if (cart.length > 0) {
-        tg.MainButton.setParams({
-            text: `تأكيد الطلب (${total.toLocaleString()} ل.س)`,
-            is_visible: true,
-            is_active: true,
-            color: '#2ecc71'
-        });
+        tg.MainButton.setText(`تأكيد الطلب (${total.toLocaleString()} ل.س)`);
+        tg.MainButton.show();
     } else {
         tg.MainButton.hide();
     }
