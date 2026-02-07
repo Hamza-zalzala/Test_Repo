@@ -104,6 +104,7 @@
 //     };
 //     tg.sendData(JSON.stringify(data));
 // });const tg = window.Telegram.WebApp;
+
 const tg = window.Telegram.WebApp;
 tg.ready();
 tg.expand();
@@ -237,3 +238,4 @@ tg.MainButton.onClick(() => {
         notes: document.getElementById('notes').value
     }));
 });
+
