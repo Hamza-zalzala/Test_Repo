@@ -103,13 +103,22 @@
 //         notes: document.getElementById('notes').value
 //     };
 //     tg.sendData(JSON.stringify(data));
-// });
-const tg = window.Telegram.WebApp;
+// });const tg = window.Telegram.WebApp;
+
 tg.ready();
 tg.expand();
 
 let cart = [];
 let menuData = {};
+
+// قاموس الإيموجي للأقسام (تأكد أن الأسماء تطابق ملف menu.json)
+const categoryEmojis = {
+    "المعجنات": "🥐",
+    "البيتزا": "🍕",
+    "المعجنات_دبل": "🥪",
+    "السندويش": "🌯",
+    "المشروبات": "🥤"
+};
 
 // تحميل البيانات
 fetch('menu.json')
@@ -122,13 +131,15 @@ fetch('menu.json')
 
 function renderTabs() {
     const nav = document.getElementById('tabs-nav');
+    nav.innerHTML = '';
     Object.keys(menuData).forEach((key, index) => {
         const btn = document.createElement('button');
         btn.className = `tab-btn ${index === 0 ? 'active' : ''}`;
-        btn.textContent = key;
+        const emoji = categoryEmojis[key] || "🍴";
+        btn.innerHTML = `<span>${emoji}</span> ${key.replace('_', ' ')}`;
         btn.onclick = (e) => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
+            e.currentTarget.classList.add('active');
             showCategory(key);
         };
         nav.appendChild(btn);
@@ -155,15 +166,16 @@ function showCategory(key) {
                 <div class="item-price">${Number(itemPrice).toLocaleString()} ل.س</div>
             </div>
             <div class="qty-control">
-                <button class="qty-btn minus" onclick="updateQty('${itemName}', ${itemPrice}, -1)">-</button>
+                <button class="qty-btn minus" onclick="window.updateQty('${itemName}', ${itemPrice}, -1)">-</button>
                 <span id="qty-${itemName}" class="qty-val">${qty}</span>
-                <button class="qty-btn plus" onclick="updateQty('${itemName}', ${itemPrice}, 1)">+</button>
+                <button class="qty-btn plus" onclick="window.updateQty('${itemName}', ${itemPrice}, 1)">+</button>
             </div>`;
         grid.appendChild(card);
     });
 }
 
-function updateQty(name, price, change) {
+// *** تعريف الدالة كـ window لضمان عمل الأزرار ***
+window.updateQty = function(name, price, change) {
     const index = cart.findIndex(i => i.name === name);
     if (index > -1) {
         cart[index].quantity += change;
@@ -172,14 +184,13 @@ function updateQty(name, price, change) {
         cart.push({ name, price: Number(price), quantity: 1 });
     }
     
-    // تحديث الرقم في البطاقة فوراً
     const qtySpan = document.getElementById(`qty-${name}`);
     if (qtySpan) {
         const item = cart.find(i => i.name === name);
         qtySpan.textContent = item ? item.quantity : 0;
     }
     updateUI();
-}
+};
 
 function toggleCart() {
     const modal = document.getElementById('cart-modal');
@@ -192,7 +203,6 @@ function updateUI() {
     const total = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
     const count = cart.reduce((sum, i) => sum + i.quantity, 0);
 
-    // تحديث الشريط العائم
     const cartBar = document.getElementById('cart-bar');
     if (cart.length > 0) {
         cartBar.style.display = 'flex';
@@ -203,7 +213,6 @@ function updateUI() {
         document.getElementById('cart-modal').style.display = 'none';
     }
 
-    // تحديث النافذة المنبثقة
     const summary = document.getElementById('cart-summary');
     summary.innerHTML = cart.map(i => `
         <div class="summary-line">
@@ -213,7 +222,6 @@ function updateUI() {
     
     document.getElementById('total').textContent = total.toLocaleString();
 
-    // تحديث زر تليجرام الرئيسي
     if (cart.length > 0) {
         tg.MainButton.setText(`تأكيد الطلب (${total.toLocaleString()} ل.س)`);
         tg.MainButton.show();
