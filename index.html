@@ -2,45 +2,52 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مطعم الزلزال - اطلب الآن</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>مطعم الوجبات السريعة</title>
+    
     <link rel="stylesheet" href="style.css">
+    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
 
-    <div class="tabs-container" id="tabs-nav"></div>
-
-    <div id="menu"></div>
-
-    <div id="cart-bar" class="cart-bar" onclick="toggleCart()">
-        <div class="cart-bar-info">
-            <span id="items-count" class="badge">0</span>
-            <span class="view-order-text">عرض طلبي</span>
+    <div class="tabs-container" id="tabs-nav">
         </div>
-        <div id="bar-total" class="bar-total">0 ل.س</div>
+
+    <div id="menu">
+        </div>
+
+    <div class="cart-bar" id="cart-bar" onclick="toggleCart()">
+        <div style="display: flex; align-items: center;">
+            <span class="badge" id="items-count">0</span>
+            <span style="margin-right: 10px; font-weight: bold;">عرض الطلب</span>
+        </div>
+        <div id="bar-total" style="font-weight: bold;">0 ل.س</div>
     </div>
 
-    <div id="cart-modal" class="cart-modal">
+    <div class="cart-modal" id="cart-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>مراجعة الطلب</h3>
-                <button onclick="toggleCart()" class="close-btn">&times;</button>
+                <h2 style="margin: 0; font-size: 1.2rem;">تفاصيل طلبك 🛒</h2>
+                <button class="close-btn" onclick="toggleCart()">&times;</button>
             </div>
-            
+
             <div id="cart-summary" class="cart-summary-list">
                 </div>
 
             <div class="notes-section">
-                <label for="notes">ملاحظات إضافية:</label>
-                <textarea id="notes" class="notes-area" placeholder="مثال: بدون حد، زيادة ثوم..."></textarea>
+                <label for="notes" style="font-weight: bold; font-size: 0.9rem;">ملاحظات إضافية:</label>
+                <textarea id="notes" class="notes-area" placeholder="مثلاً: بدون بصل، زيادة شطة..."></textarea>
             </div>
-            
+
             <div class="modal-total">
                 <span>الإجمالي:</span>
-                <span id="total">0</span> ل.س
+                <span><span id="total">0</span> ل.س</span>
             </div>
-            <p class="helper-text">اضغط على "تأكيد الطلب" بالأسفل للإرسال</p>
+            
+            <p style="text-align: center; color: #888; font-size: 0.8rem; margin-top: 15px;">
+                سيتم إرسال الطلب عبر زر التليجرام بالأسفل
+            </p>
         </div>
     </div>
 
