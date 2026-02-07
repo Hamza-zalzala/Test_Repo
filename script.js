@@ -1,3 +1,4 @@
+
 const tg = window.Telegram.WebApp;
 tg.ready();
 tg.expand();
@@ -66,10 +67,8 @@ function showCategory(key) {
     });
 }
 
-// التعديل هنا لضمان تحديث نص الزر فوراً وبدقة
 window.updateQty = (name, price, change) => {
     const itemIndex = cart.findIndex(i => i.name === name);
-    
     if (itemIndex > -1) {
         cart[itemIndex].quantity += change;
         if (cart[itemIndex].quantity <= 0) cart.splice(itemIndex, 1);
@@ -77,42 +76,49 @@ window.updateQty = (name, price, change) => {
         cart.push({ name: name, price: Number(price), quantity: 1 });
     }
 
-    // تحديث الأرقام على الشاشة
     const qtySpan = document.getElementById(`qty-${name}`);
-    const currentItem = cart.find(i => i.name === name);
-    if (qtySpan) qtySpan.textContent = currentItem ? currentItem.quantity : 0;
-
-    // استدعاء تحديث الزر
-    syncTelegramButton();
+    if (qtySpan) {
+        const currentItem = cart.find(i => i.name === name);
+        qtySpan.textContent = currentItem ? currentItem.quantity : 0;
+    }
+    updateUI();
 };
 
-function syncTelegramButton() {
-    // حساب الإجمالي الفعلي الحالي من المصفوفة
-    const currentTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    
-    // تحديث النص في الصفحة (الذي تقول أنه يظهر صحيحاً)
-    const totalEl = document.getElementById('total');
-    if (totalEl) totalEl.textContent = currentTotal.toLocaleString();
+function updateUI() {
+    const total = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+    document.getElementById('total').textContent = total.toLocaleString();
 
-    // تحديث زر التليجرام - استخدمنا setParams لضمان التحديث الشامل
+    // تحديث ملخص السلة في واجهة المستخدم
+    const summaryEl = document.getElementById('cart-summary');
+    if (summaryEl) {
+        if (cart.length > 0) {
+            summaryEl.innerHTML = cart.map(item => 
+                `<div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:4px;">
+                    <span>• ${item.name} × ${item.quantity}</span>
+                    <span>${(item.price * item.quantity).toLocaleString()} ل.س</span>
+                </div>`
+            ).join('');
+        } else {
+            summaryEl.innerHTML = '<div style="color:#aaa; text-align:center;">السلة فارغة</div>';
+        }
+    }
+
     if (cart.length > 0) {
         tg.MainButton.setParams({
-            text: `تأكيد الطلب (${currentTotal.toLocaleString()} ل.س)`,
+            text: `تأكيد الطلب (${total.toLocaleString()} ل.س)`,
             is_visible: true,
-            is_active: true
+            is_active: true,
+            color: '#2ecc71'
         });
     } else {
         tg.MainButton.hide();
     }
 }
 
-// التأكد من إرسال البيانات الصحيحة عند الضغط
 tg.MainButton.onClick(() => {
-    const finalTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const data = {
+    tg.sendData(JSON.stringify({
         orders: cart,
-        total: finalTotal,
+        total: cart.reduce((sum, i) => sum + (i.price * i.quantity), 0),
         notes: document.getElementById('notes').value
-    };
-    tg.sendData(JSON.stringify(data));
+    }));
 });
