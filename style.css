@@ -15,7 +15,6 @@ body {
     margin: 0; padding: 0; direction: rtl;
 }
 
-/* التبويبات العلوية */
 .tabs-container {
     position: sticky; top: 0; background: var(--white);
     padding: 12px; display: flex; overflow-x: auto; gap: 10px;
@@ -27,10 +26,10 @@ body {
     padding: 10px 20px; border: none; border-radius: 25px;
     background: #eee; white-space: nowrap; font-weight: bold;
     display: flex; align-items: center; gap: 6px; cursor: pointer;
+    transition: 0.3s;
 }
 .tab-btn.active { background: var(--secondary); color: white; transform: scale(1.05); }
 
-/* شبكة المنتجات */
 .menu-grid { padding: 15px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 120px; }
 
 .item-card {
@@ -47,7 +46,6 @@ body {
 .plus { background: var(--primary); }
 .minus { background: #ff4757; }
 
-/* الزر العائم "طلبي" - متوسط تماماً */
 .cart-bar {
     position: fixed; bottom: calc(20px + env(safe-area-inset-bottom));
     left: 50%; transform: translateX(-50%);
@@ -56,32 +54,38 @@ body {
     padding: 15px 25px; border-radius: 50px;
     display: none; justify-content: space-between; align-items: center;
     z-index: 2000; box-shadow: 0 10px 30px rgba(46, 204, 113, 0.4);
+    cursor: pointer;
 }
 
-/* النافذة المنبثقة - حل مشكلة كثرة الطلبات */
+.badge { background: white; color: var(--primary); padding: 2px 8px; border-radius: 10px; font-size: 0.9rem; }
+
 .cart-modal {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0,0,0,0.6); display: none; z-index: 3000; align-items: flex-end;
 }
 
 .modal-content {
-    background: white; width: 100%; max-height: 85vh; /* تمنع تغطية الشاشة بالكامل */
+    background: white; width: 100%; max-height: 85vh;
     border-radius: 25px 25px 0 0; padding: 20px;
-    display: flex; flex-direction: column; /* لترتيب العناصر داخلياً */
+    display: flex; flex-direction: column;
     animation: slideUp 0.3s ease-out;
 }
 
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-.modal-header { flex-shrink: 0; padding-bottom: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
+.modal-header { flex-shrink: 0; padding-bottom: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+.close-btn { background: none; border: none; font-size: 2rem; cursor: pointer; color: #888; }
 
-/* المنطقة القابلة للتمرير */
 .cart-summary-list {
-    flex-grow: 1; overflow-y: auto; /* تفعيل التمرير الداخلي فقط */
-    margin: 15px 0; padding-left: 5px;
+    flex-grow: 1; overflow-y: auto;
+    margin: 15px 0;
 }
-.summary-line { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #eee; }
+
+.summary-line { 
+    display: flex; justify-content: space-between; align-items: center; 
+    padding: 12px 0; border-bottom: 1px dashed #eee; 
+}
 
 .notes-section, .modal-total { flex-shrink: 0; padding-top: 10px; }
-.notes-area { width: 100%; height: 70px; border-radius: 12px; border: 1px solid #ddd; padding: 10px; resize: none; }
-.modal-total { display: flex; justify-content: space-between; font-size: 1.3rem; font-weight: 800; margin-top: 10px; }
+.notes-area { width: 100%; height: 70px; border-radius: 12px; border: 1px solid #ddd; padding: 10px; resize: none; font-family: inherit; }
+.modal-total { display: flex; justify-content: space-between; font-size: 1.3rem; font-weight: 800; margin-top: 10px; color: var(--dark); }
